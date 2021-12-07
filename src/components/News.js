@@ -2,8 +2,19 @@ import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import axios from "axios";
 import Loading from "./Loading";
+import PropTypes from "prop-types";
 
 export default class News extends Component {
+  static defaultProp = {
+    country: "in",
+    pageSize: 9,
+    category: "general",
+  };
+  static propTypes = {
+    country: PropTypes.string,
+    pageSize: PropTypes.number,
+    category: PropTypes.string,
+  };
   constructor() {
     super();
     this.state = {
@@ -16,7 +27,7 @@ export default class News extends Component {
   async componentDidMount() {
     this.setState({ loading: true });
     let res = await axios.get(
-      `https://newsapi.org/v2/top-headlines?country=in&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
+      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
     );
     console.log(this.state.loading);
     let parsedData = await res.data;
@@ -43,9 +54,9 @@ export default class News extends Component {
       });
     }
     let res = await axios.get(
-      `https://newsapi.org/v2/top-headlines?country=in&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
+      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
     );
-    // console.log(res.data);
+
     let parsedData = await res.data;
     this.setState({ articles: parsedData.articles, loading: false });
   };

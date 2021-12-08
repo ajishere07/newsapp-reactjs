@@ -79,8 +79,16 @@ export default class News extends Component {
                       ? "null"
                       : item.description.slice(0, 85)
                   }
-                  url={item.urlToImage === null ? "null" : item.urlToImage}
-                  newsUrl={item.url === null ? "null" : item.url}
+                  url={
+                    item.urlToImage === null ? "not available" : item.urlToImage
+                  }
+                  newsUrl={item.url === null ? "not available" : item.url}
+                  author={item.author === null ? "unknown" : item.author}
+                  date={
+                    item.publishedAt === null
+                      ? "not available"
+                      : item.publishedAt
+                  }
                 />
               </div>
             ))}

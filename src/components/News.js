@@ -15,14 +15,20 @@ export default class News extends Component {
     pageSize: PropTypes.number,
     category: PropTypes.string,
   };
-  constructor() {
-    super();
+
+  capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  constructor(props) {
+    super(props);
     this.state = {
       page: 1,
       articles: [],
       loading: true,
       totalArticles: 0,
     };
+    document.title = `${this.capitalize(this.props.category)} - SnapNews`;
   }
   async componentDidMount() {
     this.setState({ loading: true });

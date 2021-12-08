@@ -3,6 +3,7 @@ import NewsItem from "./NewsItem";
 import axios from "axios";
 import Loading from "./Loading";
 import PropTypes from "prop-types";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default class News extends Component {
   static defaultProp = {
@@ -30,20 +31,38 @@ export default class News extends Component {
     };
     document.title = `${this.capitalize(this.props.category)} - SnapNews`;
   }
-  async componentDidMount() {
+
+  updateNews = async () => {
     this.setState({ loading: true });
     let res = await axios.get(
       `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
     );
-    console.log(this.state.loading);
+
     let parsedData = await res.data;
     this.setState({
       articles: parsedData.articles,
       totalArticles: parsedData.totalResults,
       loading: false,
     });
-    console.log(this.state.loading);
+  };
+
+  async componentDidMount() {
+    this.updateNews();
   }
+
+  fetchMoreData = async () => {
+    this.setState({ page: this.state.page + 1 });
+    // this.setState({ loading: true });
+    let res = await axios.get(
+      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
+    );
+
+    let parsedData = await res.data;
+    this.setState({
+      articles: this.state.articles.concat(parsedData.articles),
+      totalArticles: parsedData.totalResults,
+    });
+  };
 
   handlePageRequest = async (a) => {
     if (a === "next") {
@@ -59,49 +78,57 @@ export default class News extends Component {
         page: (this.state.page -= 1),
       });
     }
-    let res = await axios.get(
-      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
-    );
-
-    let parsedData = await res.data;
-    this.setState({ articles: parsedData.articles, loading: false });
+    this.updateNews();
   };
 
   render() {
     console.log("rendered");
     return (
-      <div className="container my-3">
-        <h2>SnapNews - Top headlines</h2>
+      <>
+        <h2 className="text-center my-3">SnapNews - Top headlines</h2>
         {this.state.loading ? (
           <Loading />
         ) : (
-          <div className="row">
-            {this.state.articles.map((item) => (
-              <div key={item.url} className="col-md-4">
-                <NewsItem
-                  title={item.title === null ? "null" : item.title.slice(0, 88)}
-                  description={
-                    item.description === null
-                      ? "null"
-                      : item.description.slice(0, 85)
-                  }
-                  url={
-                    item.urlToImage === null ? "not available" : item.urlToImage
-                  }
-                  newsUrl={item.url === null ? "not available" : item.url}
-                  author={item.author === null ? "unknown" : item.author}
-                  date={
-                    item.publishedAt === null
-                      ? "not available"
-                      : item.publishedAt
-                  }
-                />
+          <InfiniteScroll
+            dataLength={this.state.articles.length}
+            next={this.fetchMoreData}
+            hasMore={this.state.articles.length !== this.state.totalArticles}
+            loader={<Loading />}
+          >
+            <div className="container">
+              <div className="row">
+                {this.state.articles.map((item) => (
+                  <div key={item.url} className="col-md-4">
+                    <NewsItem
+                      title={
+                        item.title === null ? "null" : item.title.slice(0, 88)
+                      }
+                      description={
+                        item.description === null
+                          ? "null"
+                          : item.description.slice(0, 85)
+                      }
+                      url={
+                        item.urlToImage === null
+                          ? "not available"
+                          : item.urlToImage
+                      }
+                      newsUrl={item.url === null ? "not available" : item.url}
+                      author={item.author === null ? "unknown" : item.author}
+                      date={
+                        item.publishedAt === null
+                          ? "not available"
+                          : item.publishedAt
+                      }
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          </InfiniteScroll>
         )}
 
-        <div
+        {/* <div
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -131,8 +158,8 @@ export default class News extends Component {
           >
             Next &rarr;
           </button>
-        </div>
-      </div>
+        </div> */}
+      </>
     );
   }
 }

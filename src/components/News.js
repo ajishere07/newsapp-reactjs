@@ -33,17 +33,19 @@ export default class News extends Component {
   }
 
   updateNews = async () => {
+    this.props.handleProgress(10);
     this.setState({ loading: true });
     let res = await axios.get(
       `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=50455fa67dd042a08abb0b7af3cb514c&page=${this.state.page}&pageSize=9`
     );
-
+    this.props.handleProgress(40);
     let parsedData = await res.data;
     this.setState({
       articles: parsedData.articles,
       totalArticles: parsedData.totalResults,
       loading: false,
     });
+    this.props.handleProgress(100);
   };
 
   async componentDidMount() {

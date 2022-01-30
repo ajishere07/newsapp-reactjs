@@ -84,7 +84,6 @@ export default class News extends Component {
   };
 
   render() {
-    console.log("rendered");
     return (
       <>
         <h2 className="text-center my-3">SnapNews - Top headlines</h2>

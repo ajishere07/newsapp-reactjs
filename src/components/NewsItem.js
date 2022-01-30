@@ -3,7 +3,6 @@ import React, { Component } from "react";
 export default class NewsItem extends Component {
   constructor() {
     super();
-    console.log("ok");
   }
   render() {
     let { title, description, url, newsUrl, author, date } = this.props;
